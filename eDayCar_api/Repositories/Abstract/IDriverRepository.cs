@@ -13,6 +13,7 @@ namespace eDayCar_api.Repositories
         IEnumerable<Driver> Get(IEnumerable<string> usernames);
         void Update(Driver driver);
         void Delete(Driver driver);
-     
+        bool Exists(string login, string password);
+        bool Exists(string login);
     }
 }

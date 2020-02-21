@@ -64,10 +64,10 @@ namespace eDayCar.Domain.Repositories.Concrete
             var filtr = Builders<Trip>.Filter.Where(t =>
            filter.FinishTime.AddMinutes(-30).TimeOfDay <= t.FinishTime.TimeOfDay
            && filter.FinishTime.AddMinutes(30).TimeOfDay >= t.FinishTime.TimeOfDay
-           && (new GeoCoordinate(filter.Start.X, filter.Start.Y).GetDistanceTo
-           (new GeoCoordinate(t.Start.X, t.Start.Y)) <= filter.CanWalkDistance)
-           && (new GeoCoordinate(filter.Finish.X, filter.Finish.Y).GetDistanceTo
-           (new GeoCoordinate(t.Finish.X, t.Finish.Y)) <= filter.CanWalkDistance)
+           && (new GeoCoordinate(filter.StartX, filter.StartY).GetDistanceTo
+           (new GeoCoordinate(t.StartX, t.StartY)) <= filter.CanWalkDistance)
+           && (new GeoCoordinate(filter.FinishX, filter.FinishY).GetDistanceTo
+           (new GeoCoordinate(t.FinishX, t.FinishY)) <= filter.CanWalkDistance)
            && (t.MaxPassengers > 0));
             return Collection.Find(filtr).ToList();
         }

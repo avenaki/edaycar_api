@@ -1,19 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using eDayCar.Domain.Repositories.Concrete;
+﻿using eDayCar.Domain.Repositories.Concrete;
 using eDayCar_api.Repositories;
 using eDayCar_api.Services.Abstract;
 using eDayCar_api.Services.Concrete;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Cors.Internal;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 
 namespace eDayCar_api
 {
@@ -31,7 +27,7 @@ namespace eDayCar_api
         {
            
 
-            services.AddSingleton(new MongoContext("mongodb+srv://dataUser:LdXZrudpx2feILp5@edaycar-z7aze.mongodb.net/test?retryWrites=true&w=majority"));
+            services.AddSingleton(new MongoContext("mongodb+srv://rwuser:NZkcEuHhzsZGZRgf@cluster0-yzlmt.azure.mongodb.net/test?retryWrites=true"));
             services.AddTransient<IDriverRepository, DriverRepository>();
             services.AddTransient<IAccountService, AccountService>();
             services.AddTransient<IPassengerRepository, PassengerRepository>();
@@ -46,6 +42,30 @@ namespace eDayCar_api
             {
                 options.Filters.Add(new CorsAuthorizationFilterFactory("AllowMyOrigin"));
             });
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                   .AddJwtBearer(options =>
+                   {
+                       options.RequireHttpsMetadata = false;
+                       options.TokenValidationParameters = new TokenValidationParameters
+                       {
+                            
+                            ValidateIssuer = true,
+                    
+                            ValidIssuer = AuthOptions.ISSUER,
+
+                      
+                            ValidateAudience = true,
+                        
+                            ValidAudience = AuthOptions.AUDIENCE,
+                  
+                            ValidateLifetime = true,
+
+                          
+                            IssuerSigningKey = AuthOptions.GetSymmetricSecurityKey(),
+                    
+                            ValidateIssuerSigningKey = true,
+                       };
+                   });
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)

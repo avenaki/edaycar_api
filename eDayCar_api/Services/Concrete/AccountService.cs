@@ -1,8 +1,11 @@
 ﻿using eDayCar.Domain.Entities.Identity;
 using eDayCar_api.Repositories;
 using eDayCar_api.Services.Abstract;
+using Microsoft.IdentityModel.Tokens;
 using System;
-
+using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 namespace eDayCar_api.Services.Concrete
 {
 
@@ -15,17 +18,19 @@ namespace eDayCar_api.Services.Concrete
             _driverRepository = driverRepository;
             _passengerRepository = passengerRepository;
         }
-        public bool IsPasswordCorrect(string email, string password)
-        {
-            throw new System.NotImplementedException();
-        }
+
+       
 
 
         public void RegisterDriver( Driver driver)
         {
-            var existingDriver = _driverRepository.Get(driver.Username);
+            var existingDriver = _driverRepository.Get(driver.Login);
             if (existingDriver == null)
-                _driverRepository.Add(driver);
+ 
+            {   var existingPassenger = _passengerRepository.Get(driver.Login);
+                if (existingPassenger == null)
+                { _driverRepository.Add(driver); }
+            }
             else
             {
                 throw new Exception("Username уже используется!");
@@ -35,7 +40,19 @@ namespace eDayCar_api.Services.Concrete
 
         public void RegisterPassenger(Passenger passenger)
         {
-            throw new NotImplementedException();
+            var existingDriver = _driverRepository.Get(passenger.Login);
+           if (existingDriver == null)
+
+            {
+                var existingPassenger = _passengerRepository.Get(passenger.Login);
+
+                if (existingPassenger == null)
+                    _passengerRepository.Add(passenger);
+            }
+            else
+            {
+                throw new Exception("Username уже используется!");
+            }
         }
     }
 }

@@ -31,33 +31,43 @@ namespace eDayCar.Domain.Repositories.Concrete
             return Collection.Find(_ => true).ToList();
         }
 
-        public Passenger Get(string username)
+        public Passenger Get(string login)
         {
-            return Collection.Find(i => i.Username == username).FirstOrDefault();
+            return Collection.Find(i => i.Login == login).FirstOrDefault();
         }
 
-        public IEnumerable<Passenger> Get(IEnumerable<string> usernames)
+        public IEnumerable<Passenger> Get(IEnumerable<string> logins)
         {
-            var filter = Builders<Passenger>.Filter.In(i => i.Username, usernames);
+            var filter = Builders<Passenger>.Filter.In(i => i.Login, logins);
             return Collection.Find(filter).ToList();
         }
 
         public void Update(Passenger passenger)
         {
-            var filter = Builders<Passenger>.Filter.Where(i => i.Username == passenger.Username);
+            var filter = Builders<Passenger>.Filter.Where(i => i.Login == passenger.Login);
             Collection.ReplaceOne(filter, passenger);
         }
 
         public void Delete(Passenger passenger)
         {
 
-            var filter = Builders<Passenger>.Filter.Where(i => i.Username == passenger.Username);
+            var filter = Builders<Passenger>.Filter.Where(i => i.Login == passenger.Login);
             Collection.DeleteOne(filter);
         }
 
         List<Passenger> IPassengerRepository.Get()
         {
             return Collection.Find(_ => true).ToList();
+        }
+
+        public bool Exists(string login, string password)
+        {
+            return Collection.Find(i => i.Login == login && i.Password == password).FirstOrDefault() != null;
+        }
+
+        public bool Exists(string login)
+        {
+            return Collection.Find(i => i.Login == login).FirstOrDefault() != null;
         }
     }
 }

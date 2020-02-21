@@ -13,5 +13,7 @@ namespace eDayCar_api.Repositories
         IEnumerable<Passenger> Get(IEnumerable<string> usernames);
         void Update(Passenger passenger);
         void Delete(Passenger passenger);
+        bool Exists(string login, string password);
+        bool Exists(string login);
     }
 }

@@ -11,7 +11,7 @@ namespace eDayCar_api.Services.Abstract
 
         void RegisterDriver(Driver driver);
         void RegisterPassenger(Passenger passenger);
-        bool IsPasswordCorrect(string username, string password);
+    
 
     }
 }

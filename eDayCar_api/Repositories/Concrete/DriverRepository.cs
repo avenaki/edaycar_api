@@ -31,33 +31,43 @@ namespace eDayCar.Domain.Repositories.Concrete
             return Collection.Find(_ => true).ToList();
         }
 
-        public Driver Get(string username)
+        public Driver Get(string login)
         {
-            return Collection.Find(i => i.Username == username).FirstOrDefault();
+            return Collection.Find(i => i.Login == login).FirstOrDefault();
         }
 
-        public IEnumerable<Driver> Get(IEnumerable<string> usernames)
+        public IEnumerable<Driver> Get(IEnumerable<string>logins)
         {
-            var filter = Builders<Driver>.Filter.In(i => i.Username, usernames);
+            var filter = Builders<Driver>.Filter.In(i => i.Login, logins);
             return Collection.Find(filter).ToList();
         }
 
         public void Update(Driver driver)
         {
-            var filter = Builders<Driver>.Filter.Where(i => i.Username == driver.Username);
+            var filter = Builders<Driver>.Filter.Where(i => i.Login == driver.Login);
             Collection.ReplaceOne(filter, driver);
         }
 
         public void Delete(Driver driver)
         {
 
-            var filter = Builders<Driver>.Filter.Where(i => i.Username == driver.Username);
+            var filter = Builders<Driver>.Filter.Where(i => i.Login == driver.Login);
             Collection.DeleteOne(filter);
         }
 
         List<Driver> IDriverRepository.Get()
         {
             return Collection.Find(_ => true).ToList();
+        }
+
+        public bool Exists(string login, string password)
+        {
+            return Collection.Find(i => i.Login == login && i.Password == password).FirstOrDefault() != null;
+        }
+
+        public bool Exists(string login)
+        {
+            return Collection.Find(i => i.Login == login).FirstOrDefault() != null;
         }
     }
 }

@@ -1,7 +1,16 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+using System.Threading.Tasks;
 using eDayCar.Domain.Entities.Identity;
 using eDayCar_api.Repositories;
+using eDayCar_api.Services.Abstract;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
 
 namespace eDayCar_api.Controllers
 {
@@ -9,49 +18,113 @@ namespace eDayCar_api.Controllers
     [ApiController]
     public class AccountController : ControllerBase
     {
+
+        private readonly IAccountService _accountService;
         private readonly IDriverRepository _driverRepository;
         private readonly IPassengerRepository _passengerRepository;
-        
-       public AccountController(IDriverRepository driverRepository, IPassengerRepository passengerRepository)
+
+        public AccountController(IAccountService accountService, IDriverRepository driverRepository, IPassengerRepository passengerRepository)
         {
+            _accountService = accountService;
             _driverRepository = driverRepository;
             _passengerRepository = passengerRepository;
 
         }
-        [HttpGet]
-        public ActionResult<IEnumerable<string>> Get()
-        {
-            return new string[] { "value1", "value2" };
-        }
 
-        // GET api/values/5
-        [HttpGet("{id}")]
-        public ActionResult<string> Get(int id)
-        {
-            return "value";
-        }
 
         [HttpPost]
-        public void RegistrDriver([FromBody] Driver value)
+        public void RegisterDriver([FromBody] Driver value)
         {
-            _driverRepository.Add(value);
+            _accountService.RegisterDriver(value);
         }
 
         [HttpPost]
         public void RegistrPassenger([FromBody] Passenger value)
         {
-            _passengerRepository.Add(value);
+            _accountService.RegisterPassenger(value);
         }
 
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        public class LoginViewModel
         {
+            public string login { get; set; }
+            public string password { get; set; }
         }
 
-        // DELETE api/values/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
+
+        [HttpPost]
+        public IActionResult Login([FromBody]LoginViewModel model)
         {
+            if (!_driverRepository.Exists(model.login, model.password))
+            {
+                if (!_passengerRepository.Exists(model.login, model.password))
+                {
+                    Response.StatusCode = 400;
+
+                    return null;
+                }
+            }
+            var identity = GetIdentity(model.login);
+            if (identity == null)
+            {
+                Response.StatusCode = 400;
+                return null;
+            }
+
+            var now = DateTime.UtcNow;
+            var jwt = new JwtSecurityToken(
+                    issuer: "edaycar",
+                    audience: "edaycar_client",
+                    notBefore: now,
+                    claims: identity.Claims,
+                    expires: now.Add(TimeSpan.FromHours(24)),
+                    signingCredentials: new SigningCredentials(new SymmetricSecurityKey(Encoding.ASCII.GetBytes("MeGa_S3cR3t_K39!")), SecurityAlgorithms.HmacSha256));
+            var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
+
+            var response = new
+            {
+                token = encodedJwt,
+                login = identity.Name
+            };
+
+            return new JsonResult(response);
+        }
+
+
+        private ClaimsIdentity GetIdentity(string username)
+        {
+
+            if (_driverRepository.Exists(username))
+            {
+                var driver = _driverRepository.Get(username);
+                return GetIdentityType(driver.Login, "driver");
+            }
+
+            if (_passengerRepository.Exists(username))
+            {
+                var passenger = _passengerRepository.Get(username);
+                return GetIdentityType(passenger.Login, "passenger");
+            }
+            return null;
+         
+        }
+
+        private ClaimsIdentity GetIdentityType(string login, string role)
+        {
+            var claims = new List<Claim>
+                {
+                    new Claim(ClaimsIdentity.DefaultNameClaimType, login),
+                    new Claim(ClaimsIdentity.DefaultRoleClaimType, role)
+
+                };
+            ClaimsIdentity claimsIdentity =
+            new ClaimsIdentity(claims, "Token", ClaimsIdentity.DefaultNameClaimType,
+                ClaimsIdentity.DefaultRoleClaimType);
+            return claimsIdentity;
+
+
         }
     }
+
+
+
 }
