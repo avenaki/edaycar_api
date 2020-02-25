@@ -4,14 +4,12 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
 using eDayCar.Domain.Entities.Identity;
 using eDayCar_api.Repositories;
 using eDayCar_api.Services.Abstract;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
-using Newtonsoft.Json;
+
 
 namespace eDayCar_api.Controllers
 {
@@ -40,7 +38,7 @@ namespace eDayCar_api.Controllers
         }
 
         [HttpPost]
-        public void RegistrPassenger([FromBody] Passenger value)
+        public void RegisterPassenger([FromBody] Passenger value)
         {
             _accountService.RegisterPassenger(value);
         }
@@ -139,8 +137,20 @@ namespace eDayCar_api.Controllers
 
         }
 
+        public void PutDriver([FromBody] Driver driver)
+        {
+            _driverRepository.Update(driver);
+        }
 
+
+        public void PutPassenger([FromBody] Passenger passenger)
+        {
+            _passengerRepository.Update(passenger);
+        }
     }
+
+ 
+
 
 
 
