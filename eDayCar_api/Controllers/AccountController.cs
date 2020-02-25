@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
@@ -79,17 +80,31 @@ namespace eDayCar_api.Controllers
                     expires: now.Add(TimeSpan.FromHours(24)),
                     signingCredentials: new SigningCredentials(new SymmetricSecurityKey(Encoding.ASCII.GetBytes("MeGa_S3cR3t_K39!")), SecurityAlgorithms.HmacSha256));
             var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
+            string  userRole = identity.Claims.Last().Value;
 
             var response = new
             {
                 token = encodedJwt,
-                login = identity.Name
+                login = identity.Name,
+                role = userRole
             };
 
             return new JsonResult(response);
         }
 
+        [HttpGet("{login}")]
+        public Driver GetDriver(string login)
+        {
+            return _driverRepository.Get(login); 
 
+        }
+
+        [HttpGet]
+        public Passenger GetPassenger(string login)
+        {
+            return _passengerRepository.Get(login);
+
+        }
         private ClaimsIdentity GetIdentity(string username)
         {
 
@@ -123,6 +138,8 @@ namespace eDayCar_api.Controllers
 
 
         }
+
+
     }
 
 
