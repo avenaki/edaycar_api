@@ -19,16 +19,16 @@ namespace eDayCar_api.Controllers
 
         }
         [HttpGet]
-        public ActionResult<IEnumerable<string>> Get()
+        public ActionResult<IEnumerable<Trip>> Get()
         {
-            return new string[] { "value1", "value2" };
+            return _tripRepository.Get();
         }
 
-        // GET api/values/5
+   
         [HttpGet("{id}")]
-        public ActionResult<string> Get(int id)
+        public ActionResult<Trip> Get(string id)
         {
-            return "value";
+            return _tripRepository.Get(id);
         }
 
         [HttpPost]
@@ -37,21 +37,18 @@ namespace eDayCar_api.Controllers
             _tripRepository.Add(value);
         }
 
-        [HttpPost]
-        public void RegisterPassenger([FromBody] Passenger value)
+     
+
+    
+        public void Put( [FromBody] Trip trip)
         {
-           
+            _tripRepository.Update(trip);
         }
 
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
-
-        // DELETE api/values/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public void Delete(string id)
         {
+            _tripRepository.Delete(id);
         }
     }
 }

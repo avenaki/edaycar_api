@@ -103,6 +103,19 @@ namespace eDayCar_api.Controllers
             return _passengerRepository.Get(login);
 
         }
+        [HttpGet]
+        public List<Driver> GetDrivers()
+        {
+            return _driverRepository.Get();
+
+        }
+
+        [HttpGet]
+        public List<Passenger> GetPassengers()
+        {
+            return _passengerRepository.Get();
+
+        }
         private ClaimsIdentity GetIdentity(string username)
         {
 

@@ -15,7 +15,7 @@ namespace eDayCar_api.Repositories
         Trip Get(string id);
         IEnumerable<Trip> Get(IEnumerable<string> ids);
         void Update(Trip trip);
-        void Delete(Trip trip);
+        void Delete(string id);
         IEnumerable<Trip> Get(TripSearchFilter filter);
     }
 }
