@@ -32,9 +32,11 @@ namespace eDayCar_api.Controllers
 
 
         [HttpPost]
-        public void RegisterDriver([FromBody] Driver value)
+        public IActionResult RegisterDriver([FromBody] Driver value)
         {
             _accountService.RegisterDriver(value);
+            var driverModel = new LoginViewModel(value.Login, value.Password);
+            return LoginUser(driverModel);
         }
 
         [HttpPost]
@@ -47,47 +49,19 @@ namespace eDayCar_api.Controllers
         {
             public string login { get; set; }
             public string password { get; set; }
+
+            public LoginViewModel(string login, string password)
+            {
+                this.login = login;
+                this.password = password;
+            }
         }
 
 
         [HttpPost]
         public IActionResult Login([FromBody]LoginViewModel model)
         {
-            if (!_driverRepository.Exists(model.login, model.password))
-            {
-                if (!_passengerRepository.Exists(model.login, model.password))
-                {
-                    Response.StatusCode = 400;
-
-                    return null;
-                }
-            }
-            var identity = GetIdentity(model.login);
-            if (identity == null)
-            {
-                Response.StatusCode = 400;
-                return null;
-            }
-
-            var now = DateTime.UtcNow;
-            var jwt = new JwtSecurityToken(
-                    issuer: "edaycar",
-                    audience: "edaycar_client",
-                    notBefore: now,
-                    claims: identity.Claims,
-                    expires: now.Add(TimeSpan.FromHours(24)),
-                    signingCredentials: new SigningCredentials(new SymmetricSecurityKey(Encoding.ASCII.GetBytes("MeGa_S3cR3t_K39!")), SecurityAlgorithms.HmacSha256));
-            var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
-            string  userRole = identity.Claims.Last().Value;
-
-            var response = new
-            {
-                token = encodedJwt,
-                login = identity.Name,
-                role = userRole
-            };
-
-            return new JsonResult(response);
+            return this.LoginUser(model);
         }
 
         [HttpGet("{login}")]
@@ -159,6 +133,45 @@ namespace eDayCar_api.Controllers
         public void PutPassenger([FromBody] Passenger passenger)
         {
             _passengerRepository.Update(passenger);
+        }
+
+        private JsonResult LoginUser(LoginViewModel model)
+        {
+            if (!_driverRepository.Exists(model.login, model.password))
+            {
+                if (!_passengerRepository.Exists(model.login, model.password))
+                {
+                    Response.StatusCode = 400;
+
+                    return null;
+                }
+            }
+            var identity = GetIdentity(model.login);
+            if (identity == null)
+            {
+                Response.StatusCode = 400;
+                return null;
+            }
+
+            var now = DateTime.UtcNow;
+            var jwt = new JwtSecurityToken(
+                    issuer: "edaycar",
+                    audience: "edaycar_client",
+                    notBefore: now,
+                    claims: identity.Claims,
+                    expires: now.Add(TimeSpan.FromHours(24)),
+                    signingCredentials: new SigningCredentials(new SymmetricSecurityKey(Encoding.ASCII.GetBytes("MeGa_S3cR3t_K39!")), SecurityAlgorithms.HmacSha256));
+            var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
+            string userRole = identity.Claims.Last().Value;
+
+            var response = new
+            {
+                token = encodedJwt,
+                login = identity.Name,
+                role = userRole
+            };
+
+            return new JsonResult(response);
         }
     }
 
