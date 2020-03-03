@@ -16,5 +16,5 @@ namespace eDayCar.Domain.Entities.Identity
         public string AccountPhoto { get; set; }
         public DateTime Birthdate { get; set; }
 
-    }
+    }    
 }

@@ -124,13 +124,14 @@ namespace eDayCar_api.Controllers
 
         }
 
-        public void PutDriver([FromBody] Driver driver)
+        [HttpPut]
+        public void UpdateDriver([FromBody] Driver driver)
         {
             _driverRepository.Update(driver);
         }
 
-
-        public void PutPassenger([FromBody] Passenger passenger)
+        [HttpPut]
+        public void UpdatePassenger([FromBody] Passenger passenger)
         {
             _passengerRepository.Update(passenger);
         }
