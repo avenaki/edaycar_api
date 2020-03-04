@@ -125,8 +125,10 @@ namespace eDayCar_api.Controllers
         }
 
         [HttpPut]
-        public void UpdateDriver([FromBody] Driver driver)
+        public void UpdateDriver( Driver driver)
         {
+            var currentDriver = _driverRepository.Get(driver.Login);
+            driver.Id = currentDriver.Id;
             _driverRepository.Update(driver);
         }
 
