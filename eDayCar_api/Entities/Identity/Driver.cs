@@ -9,7 +9,7 @@ namespace eDayCar.Domain.Entities.Identity
     public class Driver: User
     {
         public string CarModel { get; set; }
-        public string Colour { get; set; }
+        public string Color { get; set; }
         public int Experience { get; set; }
         public virtual List<Trip> Trips { get; set; }
         public Driver()
