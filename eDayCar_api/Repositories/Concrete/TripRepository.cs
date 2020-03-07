@@ -51,11 +51,18 @@ namespace eDayCar.Domain.Repositories.Concrete
             Collection.ReplaceOne(filter, trip);
         }
 
-        public void Delete(string id)
+        public string Delete(string id)
         {
-
-            var filter = Builders<Trip>.Filter.Where(i => i.Id == id);
-            Collection.DeleteOne(filter);
+            try
+            {
+                var filter = Builders<Trip>.Filter.Where(i => i.Id == id);
+                Collection.DeleteOne(filter);
+                return "success";
+            }
+            catch
+            {
+                return "fail";
+            }
         }
 
 

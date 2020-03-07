@@ -13,6 +13,8 @@ namespace eDayCar.Domain.Entities.Identity
         public double StartY { get; set; }
         public double FinishX { get; set; }
         public double FinishY { get; set; }
+        public string StartPlace { get; set; }
+        public string FinishPlace { get; set; }
         public int MaxPassengers { get; set; }
         [DataType(DataType.Time)]
         public DateTime StartTime { get; set; }
