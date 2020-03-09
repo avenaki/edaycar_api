@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using eDayCar.Domain.Entities.Identity;
+using eDayCar.Domain.Entities.Value;
 using eDayCar_api.Repositories;
 using eDayCar_api.Services.Abstract;
 using Microsoft.AspNetCore.Mvc;
@@ -31,6 +32,11 @@ namespace eDayCar_api.Controllers
             return _tripRepository.Get(id);
         }
 
+        [HttpPost]
+        public IEnumerable<Trip> FilterTrips([FromBody] TripSearchFilter filter)
+        {
+            return _tripRepository.Get(filter);
+        }
         [HttpPost]
         public void CreateTrip([FromBody] Trip value)
         {
