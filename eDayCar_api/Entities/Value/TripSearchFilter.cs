@@ -14,10 +14,10 @@ namespace eDayCar.Domain.Entities.Value
         public double StartY { get; set; }
         public double FinishX { get; set; }
         public double FinishY { get; set; }
-        [DataType(DataType.Time)]
-        public DateTime StartTime { get; set; }
-        [DataType(DataType.Time)]
-        public DateTime FinishTime { get; set; }
+
+        public string StartTime { get; set; }
+
+        public string FinishTime { get; set; }
       
     }
 }

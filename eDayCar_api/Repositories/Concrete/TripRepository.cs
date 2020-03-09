@@ -5,11 +5,11 @@ using MongoDB.Driver;
 using System.Collections.Generic;
 using System.Linq;
 using GeoCoordinatePortable;
-
+using System;
 
 namespace eDayCar.Domain.Repositories.Concrete
 {
-    public class TripRepository: ITripRepository
+    public class TripRepository : ITripRepository
     {
         private IMongoCollection<Trip> Collection { get; }
 
@@ -18,7 +18,7 @@ namespace eDayCar.Domain.Repositories.Concrete
             Collection = context.GetCollection<Trip>("Trips");
         }
 
-        
+
         public void Add(Trip trip)
         {
             Collection.InsertOne(trip);
@@ -68,15 +68,18 @@ namespace eDayCar.Domain.Repositories.Concrete
 
         public IEnumerable<Trip> Get(TripSearchFilter filter)
         {
-            var filtr = Builders<Trip>.Filter.Where(t =>
-           filter.FinishTime.AddMinutes(-30).TimeOfDay <= t.FinishTime.TimeOfDay
-           && filter.FinishTime.AddMinutes(30).TimeOfDay >= t.FinishTime.TimeOfDay
-           && (new GeoCoordinate(filter.StartX, filter.StartY).GetDistanceTo
-           (new GeoCoordinate(t.StartX, t.StartY)) <= filter.CanWalkDistance)
-           && (new GeoCoordinate(filter.FinishX, filter.FinishY).GetDistanceTo
-           (new GeoCoordinate(t.FinishX, t.FinishY)) <= filter.CanWalkDistance)
-           && (t.MaxPassengers > 0));
-            return Collection.Find(filtr).ToList();
+            var startTime = TimeSpan.Parse(filter.StartTime);
+            var finishTime = TimeSpan.Parse(filter.FinishTime);
+            var allTrips = Get();
+            var fitByTime = allTrips.Where(t =>
+           finishTime.Add(TimeSpan.FromMinutes(-30)) <= t.FinishTime.ToLocalTime().TimeOfDay
+           && finishTime.Add(TimeSpan.FromMinutes(30)) >= t.FinishTime.ToLocalTime().TimeOfDay).ToList();
+            var fitByFinish = fitByTime.Where(t =>
+            new GeoCoordinate(filter.StartX, filter.StartY).GetDistanceTo(new GeoCoordinate(t.StartX, t.StartY)) <= filter.CanWalkDistance
+           && new GeoCoordinate(filter.FinishX, filter.FinishY).GetDistanceTo
+           (new GeoCoordinate(t.FinishX, t.FinishY)) <= filter.CanWalkDistance).ToList();
+            var fit = fitByFinish.Where(t => t.MaxPassengers > 0).ToList();
+            return fit.ToList();
         }
 
         List<Trip> ITripRepository.Get()
