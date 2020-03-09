@@ -20,8 +20,8 @@ namespace eDayCar.Domain.Entities.Identity
         public DateTime StartTime { get; set; }
         [DataType(DataType.Time)]
         public DateTime FinishTime { get; set; }
-        public virtual Driver Driver { get; set; }
-        public virtual List<Passenger> Passengers { get; set; }
+        public virtual string DriverLogin { get; set; }
+        public virtual List<String> PassengersLogins { get; set; }
 
 
     }
