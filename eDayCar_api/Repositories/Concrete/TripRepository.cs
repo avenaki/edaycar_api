@@ -3,8 +3,8 @@ using eDayCar.Domain.Entities.Value;
 using eDayCar_api.Repositories;
 using MongoDB.Driver;
 using System.Collections.Generic;
-using System.Device.Location;
 using System.Linq;
+using GeoCoordinatePortable;
 
 
 namespace eDayCar.Domain.Repositories.Concrete
