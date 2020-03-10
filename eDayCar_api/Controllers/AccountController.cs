@@ -40,9 +40,11 @@ namespace eDayCar_api.Controllers
         }
 
         [HttpPost]
-        public void RegisterPassenger([FromBody] Passenger value)
+        public IActionResult RegisterPassenger([FromBody] Passenger value)
         {
             _accountService.RegisterPassenger(value);
+            var passengerModel = new LoginViewModel(value.Login, value.Password);
+            return LoginUser(passengerModel);
         }
 
         public class LoginViewModel
@@ -71,7 +73,7 @@ namespace eDayCar_api.Controllers
 
         }
 
-        [HttpGet]
+        [HttpGet("{login}")]
         public Passenger GetPassenger(string login)
         {
             return _passengerRepository.Get(login);
@@ -135,6 +137,8 @@ namespace eDayCar_api.Controllers
         [HttpPut]
         public void UpdatePassenger([FromBody] Passenger passenger)
         {
+            var currentPassenger = _passengerRepository.Get(passenger.Login);
+            passenger.Id = currentPassenger.Id;
             _passengerRepository.Update(passenger);
         }
 

@@ -13,11 +13,25 @@ namespace eDayCar_api.Controllers
     {
        
         private readonly ITripRepository _tripRepository;
-        
-       public TripController(ITripRepository tripRepository)
-        {
-            _tripRepository = tripRepository; 
+        private readonly IPassengerRepository _passengerRepository;
 
+        
+       public TripController(ITripRepository tripRepository, IPassengerRepository passengerRepository)
+        {
+            _tripRepository = tripRepository;
+            _passengerRepository = passengerRepository;
+
+        }
+        public class TakeTripViewModel
+        {
+            public Trip trip { get; set; }
+            public string login { get; set; }
+
+            public TakeTripViewModel(Trip trip, string login)
+            {
+                this.trip = trip;
+                this.login = login;
+            }
         }
         [HttpGet]
         public ActionResult<IEnumerable<Trip>> Get()
@@ -43,8 +57,18 @@ namespace eDayCar_api.Controllers
             _tripRepository.Add(value);
         }
 
-     
-
+     [HttpPost]
+     public void TakeTrip([FromBody] TakeTripViewModel info)
+        {
+            info.trip.MaxPassengers = info.trip.MaxPassengers - 1;
+            if(info.trip.PassengersLogins == null)
+            {
+                info.trip.PassengersLogins = new List<string>();
+            }
+            info.trip.PassengersLogins.Add(info.login);
+            _tripRepository.Update(info.trip);
+         
+        }
     
         public void Put( [FromBody] Trip trip)
         {
