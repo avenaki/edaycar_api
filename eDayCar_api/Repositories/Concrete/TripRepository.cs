@@ -72,8 +72,8 @@ namespace eDayCar.Domain.Repositories.Concrete
             var finishTime = TimeSpan.Parse(filter.FinishTime);
             var allTrips = Get();
             var fitByTime = allTrips.Where(t =>
-           finishTime.Add(TimeSpan.FromMinutes(-30)) <= t.FinishTime.ToLocalTime().TimeOfDay
-           && finishTime.Add(TimeSpan.FromMinutes(30)) >= t.FinishTime.ToLocalTime().TimeOfDay).ToList();
+           finishTime.Add(TimeSpan.FromMinutes(-30)) <= t.FinishTime.ToUniversalTime().TimeOfDay
+           && finishTime.Add(TimeSpan.FromMinutes(30)) >= t.FinishTime.ToUniversalTime().TimeOfDay).ToList();
             var fitByFinish = fitByTime.Where(t =>
             new GeoCoordinate(filter.StartX, filter.StartY).GetDistanceTo(new GeoCoordinate(t.StartX, t.StartY)) <= filter.CanWalkDistance
            && new GeoCoordinate(filter.FinishX, filter.FinishY).GetDistanceTo
