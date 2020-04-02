@@ -49,6 +49,7 @@ namespace eDayCar.Domain.Repositories.Concrete
         {
             var filter = Builders<Trip>.Filter.Where(i => i.Id == trip.Id);
             Collection.ReplaceOne(filter, trip);
+        
         }
 
         public string Delete(string id)
