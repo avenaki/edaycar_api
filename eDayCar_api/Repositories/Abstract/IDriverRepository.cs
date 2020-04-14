@@ -15,5 +15,6 @@ namespace eDayCar_api.Repositories
         void Delete(Driver driver);
         bool Exists(string login, string password);
         bool Exists(string login);
+        string GetPicture(string login);
     }
 }

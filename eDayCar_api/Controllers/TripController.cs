@@ -3,12 +3,14 @@ using eDayCar.Domain.Entities.Identity;
 using eDayCar.Domain.Entities.Value;
 using eDayCar_api.Repositories;
 using eDayCar_api.Services.Abstract;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace eDayCar_api.Controllers
 {
     [Route("api/trip/[action]")]
     [ApiController]
+    [Authorize]
     public class TripController : ControllerBase
     {
        

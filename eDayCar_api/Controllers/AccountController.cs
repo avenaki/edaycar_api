@@ -7,6 +7,8 @@ using System.Text;
 using eDayCar.Domain.Entities.Identity;
 using eDayCar_api.Repositories;
 using eDayCar_api.Services.Abstract;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 
@@ -66,26 +68,44 @@ namespace eDayCar_api.Controllers
             return this.LoginUser(model);
         }
 
+        [Authorize]
         [HttpGet("{login}")]
         public Driver GetDriver(string login)
         {
             return _driverRepository.Get(login); 
 
         }
+        [Authorize]
+        [HttpGet("{login}")]
+        public JsonResult GetUserPicture(string login)
+        {
+       
+                var picture = _driverRepository.GetPicture(login);
+                 if( picture == "none")
+            {
+                picture = _passengerRepository.GetPicture(login);
+            }
 
+            return  new JsonResult( new { picture });
+           
+
+        }
+
+        [Authorize]
         [HttpGet("{login}")]
         public Passenger GetPassenger(string login)
         {
             return _passengerRepository.Get(login);
 
         }
+        [Authorize]
         [HttpGet]
         public List<Driver> GetDrivers()
         {
             return _driverRepository.Get();
 
         }
-
+        [Authorize]
         [HttpGet]
         public List<Passenger> GetPassengers()
         {
@@ -114,8 +134,8 @@ namespace eDayCar_api.Controllers
         {
             var claims = new List<Claim>
                 {
-                    new Claim(ClaimsIdentity.DefaultNameClaimType, login),
-                    new Claim(ClaimsIdentity.DefaultRoleClaimType, role)
+                    new Claim(ClaimTypes.Name, login),
+                    new Claim(ClaimTypes.Role, role)
 
                 };
             ClaimsIdentity claimsIdentity =
@@ -125,7 +145,7 @@ namespace eDayCar_api.Controllers
 
 
         }
-
+        [Authorize]
         [HttpPut]
         public void UpdateDriver( Driver driver)
         {
@@ -133,7 +153,7 @@ namespace eDayCar_api.Controllers
             driver.Id = currentDriver.Id;
             _driverRepository.Update(driver);
         }
-
+        [Authorize]
         [HttpPut]
         public void UpdatePassenger([FromBody] Passenger passenger)
         {
@@ -159,18 +179,18 @@ namespace eDayCar_api.Controllers
                 Response.StatusCode = 400;
                 return null;
             }
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes("трлолдлжлжлжлжцд");
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = identity,
+                Expires = DateTime.UtcNow.AddDays(7),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+            };
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            var encodedJwt = tokenHandler.WriteToken(token);
 
-            var now = DateTime.UtcNow;
-            var jwt = new JwtSecurityToken(
-                    issuer: "edaycar",
-                    audience: "edaycar_client",
-                    notBefore: now,
-                    claims: identity.Claims,
-                    expires: now.Add(TimeSpan.FromHours(24)),
-                    signingCredentials: new SigningCredentials(new SymmetricSecurityKey(Encoding.ASCII.GetBytes("MeGa_S3cR3t_K39!")), SecurityAlgorithms.HmacSha256));
-            var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
             string userRole = identity.Claims.Last().Value;
-
             var response = new
             {
                 token = encodedJwt,

@@ -69,5 +69,17 @@ namespace eDayCar.Domain.Repositories.Concrete
         {
             return Collection.Find(i => i.Login == login).FirstOrDefault() != null;
         }
+
+        public string GetPicture(string login)
+        {
+            try
+            {
+                return Collection.Find(i => i.Login == login).FirstOrDefault().AccountPhoto;
+            }
+            catch
+            {
+                return "none";
+            }
+        }
     }
 }
