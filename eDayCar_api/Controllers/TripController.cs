@@ -78,9 +78,9 @@ namespace eDayCar_api.Controllers
         }
 
         [HttpDelete("{id}")]
-        public string Delete(string id)
+        public IActionResult Delete( string id)
         {
-            return _tripRepository.Delete(id);
+            return new JsonResult( _tripRepository.Delete(id));
         }
     }
 }
