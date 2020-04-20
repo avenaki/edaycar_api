@@ -30,8 +30,8 @@ namespace eDayCar_api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-           
 
+            string[] origins = new string[] { "http://localhost:4200", "https://edaycar.herokuapp.com" };
             services.AddSingleton(new MongoContext("mongodb+srv://rwuser:NZkcEuHhzsZGZRgf@cluster0-yzlmt.azure.mongodb.net/test?retryWrites=true"));
             services.AddTransient<IDriverRepository, DriverRepository>();
             services.AddTransient<IRequestRepository, RequestRepository>();
@@ -42,7 +42,7 @@ namespace eDayCar_api
             services.AddCors(options =>
             {
                 options.AddPolicy("AllowMyOrigin",
-                builder => { builder.WithOrigins("http://localhost:4200"); builder.AllowAnyMethod(); builder.AllowAnyHeader(); builder.AllowCredentials(); });
+                builder => { builder.WithOrigins(origins); builder.AllowAnyMethod(); builder.AllowAnyHeader(); builder.AllowCredentials(); });
             });
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.Configure<MvcOptions>(options =>
